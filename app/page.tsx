@@ -107,6 +107,9 @@ export default function Home() {
           </div>
         )}
       </div>
+      <p className="text-center py-4" style={{ fontSize: '0.6rem', color: 'var(--text-dim)', fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+        仅展示近 7 天内的新闻
+      </p>
     </div>
   )
 }

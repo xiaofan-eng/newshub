@@ -42,14 +42,22 @@ export default function Header({ onShowBookmarks, showingBookmarks }: {
         {/* Bookmark button */}
         <button
           onClick={onShowBookmarks}
-          className="w-20 flex items-center justify-end gap-1 text-xs transition-colors cursor-pointer"
+          title="点击查看收藏的文章"
+          className="w-20 flex flex-col items-end gap-0.5 transition-colors cursor-pointer"
           style={{
             color: showingBookmarks ? 'var(--accent)' : 'var(--text-dim)',
             fontFamily: 'var(--font-body)',
           }}
         >
-          <span style={{ fontSize: '1rem' }}>{showingBookmarks ? '♥' : '♡'}</span>
-          <span>{bookmarks.length > 0 ? bookmarks.length : ''}</span>
+          <div className="flex items-center gap-1 text-xs">
+            <span style={{ fontSize: '1rem' }}>{showingBookmarks ? '♥' : '♡'}</span>
+            <span>{bookmarks.length > 0 ? bookmarks.length : ''}</span>
+          </div>
+          {!showingBookmarks && (
+            <span style={{ fontSize: '0.5rem', letterSpacing: '0.05em', color: 'var(--text-dim)', opacity: 0.7 }}>
+              查看收藏
+            </span>
+          )}
         </button>
       </div>
     </header>

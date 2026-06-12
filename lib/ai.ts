@@ -24,7 +24,7 @@ async function deepseekChat(prompt: string, maxTokens: number): Promise<string> 
 export async function pickTopArticles(articles: ArticleMeta[]): Promise<string[]> {
   const list = articles.map((a, i) => `${i + 1}. [${a.title}] ${a.description}\nURL: ${a.url}`).join('\n\n')
   const text = await deepseekChat(
-    `以下是今日新闻文章列表，请从中选出最重要的3篇。评分维度：影响力（全球/行业范围）、时效性（重大突发或首发）、多领域关联度。\n\n只返回3个URL，每行一个，不要任何其他内容。\n\n${list}`,
+    `以下是今日新闻文章列表，请从中选出最重要的3篇。评分维度：影响力（全球/行业范围）、时效性（重大突发或首发）、多领域关联度（涉及世界、AI、科技、财经、健康、时尚、美妆等领域越多越优先）。\n\n只返回3个URL，每行一个，不要任何其他内容。\n\n${list}`,
     512
   )
   return text.split('\n').map(l => l.trim()).filter(l => l.startsWith('http')).slice(0, 3)
