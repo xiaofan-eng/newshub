@@ -7,7 +7,7 @@ const SOURCES_BY_CATEGORY: Record<string, string[]> = {
   'AI':   ['OpenAI Blog', 'Hugging Face', 'MIT Tech Review', 'VentureBeat AI'],
   '科技': ['TechCrunch', 'Hacker News', 'Ars Technica', 'The Register'],
   '财经': ['Financial Times', '财新网', 'Bloomberg', 'WSJ'],
-  '健康': ['Health.com', 'Healthline', 'Medical News Today'],
+  '健康': ['WHO News', 'WebMD', 'Harvard Health'],
   '时尚': ['Vogue', 'GQ', "Harper's Bazaar"],
   '美妆': ['Allure', 'Refinery29'],
   '社会': ['NYT', '澎湃新闻'],

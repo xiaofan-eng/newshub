@@ -23,9 +23,9 @@ export const RSS_SOURCES = [
   { name: 'Ars Technica',   url: 'https://feeds.arstechnica.com/arstechnica/index',                    category: '科技', isChinese: false },
   { name: 'The Register',   url: 'https://www.theregister.com/headlines.atom',                         category: '科技', isChinese: false },
   // 健康
-  { name: 'Health.com',     url: 'https://www.health.com/feeds/all',                                   category: '健康', isChinese: false },
-  { name: 'Healthline',     url: 'https://www.healthline.com/nutrition/feed',                          category: '健康', isChinese: false },
-  { name: 'Medical News Today', url: 'https://www.medicalnewstoday.com/rss/news',                     category: '健康', isChinese: false },
+  { name: 'WHO News',       url: 'https://www.who.int/rss-feeds/news-english.xml',                    category: '健康', isChinese: false },
+  { name: 'WebMD',          url: 'https://www.webmd.com/rss/default.aspx',                            category: '健康', isChinese: false },
+  { name: 'Harvard Health', url: 'https://www.health.harvard.edu/blog/feed',                          category: '健康', isChinese: false },
   // 时尚
   { name: 'Vogue',          url: 'https://www.vogue.com/feed/rss',                                     category: '时尚', isChinese: false },
   { name: 'GQ',             url: 'https://www.gq.com/feed/rss',                                        category: '时尚', isChinese: false },
