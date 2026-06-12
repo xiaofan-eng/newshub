@@ -10,12 +10,12 @@ function authorized(req: Request) {
 export async function GET(req: Request) {
   if (!authorized(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // 取过去24小时内抓取的文章（兼容时区），且只选有摘要的
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000)
+  // 取过去7天内发布的文章中选
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
 
   const articles = await prisma.article.findMany({
     where: {
-      fetchedAt: { gte: since },
+      publishedAt: { gte: since },
       translated: true,
       description: { not: '' },
     },
