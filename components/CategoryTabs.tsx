@@ -1,6 +1,6 @@
 'use client'
 
-const CATEGORIES = ['全部', '世界', 'AI', '科技', '财经', '健康', '时尚', '美妆']
+const CATEGORIES = ['全部', '世界', 'AI', '科技', '财经', '健康', '时尚', '美妆', '社会']
 
 const SOURCES_BY_CATEGORY: Record<string, string[]> = {
   '世界': ['Reuters World', 'BBC World', 'AP News', 'Al Jazeera', 'The Guardian'],
@@ -10,6 +10,7 @@ const SOURCES_BY_CATEGORY: Record<string, string[]> = {
   '健康': ['WebMD', 'Health.com', '丁香园'],
   '时尚': ['Vogue', 'GQ', "Harper's Bazaar"],
   '美妆': ['Allure', 'Byrdie', 'Into The Gloss'],
+  '社会': ['NYT', '澎湃新闻'],
 }
 
 export default function CategoryTabs({
