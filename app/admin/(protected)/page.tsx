@@ -12,6 +12,7 @@ export default function AdminPage() {
   const [sources, setSources] = useState<Source[]>([])
   const [activeCatId, setActiveCatId] = useState<string | null>(null)
   const [showSourceForm, setShowSourceForm] = useState(false)
+  const [showCatForm, setShowCatForm] = useState(false)
   const [editingSource, setEditingSource] = useState<Source | null>(null)
   const [testResults, setTestResults] = useState<Record<string, { ok: boolean; count?: number; error?: string }>>({})
 
@@ -59,6 +60,20 @@ export default function AdminPage() {
     loadCategories()
   }
 
+  async function deleteCategory(id: string) {
+    if (!confirm('确认删除此分类？删除前请先删除该分类下所有来源。')) return
+    const res = await fetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
+    const data = await res.json()
+    if (!res.ok) { alert(data.error); return }
+    setActiveCatId(null)
+    loadCategories()
+  }
+
+  async function addCategory(name: string, order: number) {
+    await fetch('/api/admin/categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, order }) })
+    loadCategories()
+  }
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--ink)', color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>
       {/* Header */}
@@ -70,19 +85,30 @@ export default function AdminPage() {
       <div className="flex" style={{ minHeight: 'calc(100vh - 49px)' }}>
         {/* 左侧分类 */}
         <aside className="w-48 shrink-0 border-r p-3" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-          <p className="text-xs mb-2 uppercase tracking-wider" style={{ color: 'var(--text-dim)' }}>分类</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-dim)' }}>分类</p>
+            <button onClick={() => setShowCatForm(true)} className="text-xs cursor-pointer" style={{ color: 'var(--accent)' }}>+ 新增</button>
+          </div>
           {categories.map(cat => (
             <div
               key={cat.id}
               onClick={() => setActiveCatId(cat.id)}
-              className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-sm mb-0.5"
+              className="flex items-center justify-between px-2 py-1.5 rounded cursor-pointer text-sm mb-0.5 group"
               style={{
                 background: activeCatId === cat.id ? 'var(--accent)' : 'transparent',
                 color: activeCatId === cat.id ? '#fff' : (cat.enabled ? 'var(--text-primary)' : 'var(--text-dim)'),
               }}
             >
               <span>{cat.name}</span>
-              <span className="text-xs opacity-60">{cat._count.sources}</span>
+              <div className="flex items-center gap-1">
+                <span className="text-xs opacity-60">{cat._count.sources}</span>
+                <button
+                  onClick={e => { e.stopPropagation(); deleteCategory(cat.id) }}
+                  className="text-xs opacity-0 group-hover:opacity-100 cursor-pointer ml-1"
+                  style={{ color: activeCatId === cat.id ? 'rgba(255,255,255,0.7)' : '#dc2626' }}
+                  title="删除分类"
+                >✕</button>
+              </div>
             </div>
           ))}
         </aside>
@@ -161,7 +187,7 @@ export default function AdminPage() {
         </main>
       </div>
 
-      {/* 新增/编辑弹窗 */}
+      {/* 新增/编辑来源弹窗 */}
       {showSourceForm && (
         <SourceForm
           source={editingSource}
@@ -169,6 +195,15 @@ export default function AdminPage() {
           defaultCategoryId={activeCatId ?? ''}
           onClose={() => setShowSourceForm(false)}
           onSaved={() => { setShowSourceForm(false); loadSources(); loadCategories() }}
+        />
+      )}
+
+      {/* 新增分类弹窗 */}
+      {showCatForm && (
+        <CategoryForm
+          order={categories.length + 1}
+          onClose={() => setShowCatForm(false)}
+          onSaved={(name, order) => { addCategory(name, order); setShowCatForm(false) }}
         />
       )}
     </div>
@@ -246,6 +281,41 @@ function SourceForm({ source, categories, defaultCategoryId, onClose, onSaved }:
           </button>
         </div>
       </form>
+    </div>
+  )
+}
+
+function CategoryForm({ order, onClose, onSaved }: {
+  order: number
+  onClose: () => void
+  onSaved: (name: string, order: number) => void
+}) {
+  const [name, setName] = useState('')
+  const [ord, setOrd] = useState(order)
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: 'rgba(0,0,0,0.4)' }}>
+      <div className="w-80 p-6 rounded-2xl" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <h3 className="font-semibold mb-4" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>新增分类</h3>
+        <div className="mb-3">
+          <label className="text-xs block mb-1" style={{ color: 'var(--text-dim)' }}>分类名</label>
+          <input value={name} onChange={e => setName(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+            style={{ background: 'var(--ink)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="text-xs block mb-1" style={{ color: 'var(--text-dim)' }}>排序</label>
+          <input type="number" value={ord} onChange={e => setOrd(parseInt(e.target.value))}
+            className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+            style={{ background: 'var(--ink)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+          />
+        </div>
+        <div className="flex gap-2">
+          <button onClick={onClose} className="flex-1 py-2 rounded-lg text-sm cursor-pointer" style={{ background: 'var(--surface-hover)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>取消</button>
+          <button onClick={() => name.trim() && onSaved(name.trim(), ord)} className="flex-1 py-2 rounded-lg text-sm cursor-pointer" style={{ background: 'var(--accent)', color: '#fff' }}>保存</button>
+        </div>
+      </div>
     </div>
   )
 }
