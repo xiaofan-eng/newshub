@@ -17,8 +17,10 @@ model Article {
   fetchedAt   DateTime  @default(now())
   isPickedAt  DateTime?
   aiSummary   String?
+  translated  Boolean   @default(false)
 
   @@index([category])
   @@index([fetchedAt])
   @@index([isPickedAt])
+  @@index([translated])
 }
