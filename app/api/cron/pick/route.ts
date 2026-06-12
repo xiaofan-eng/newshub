@@ -10,13 +10,15 @@ function authorized(req: Request) {
 export async function GET(req: Request) {
   if (!authorized(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const tomorrow = new Date(today)
-  tomorrow.setDate(tomorrow.getDate() + 1)
+  // 取过去24小时内抓取的文章（兼容时区），且只选有摘要的
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
   const articles = await prisma.article.findMany({
-    where: { fetchedAt: { gte: today, lt: tomorrow } },
+    where: {
+      fetchedAt: { gte: since },
+      translated: true,
+      description: { not: '' },
+    },
     select: { url: true, title: true, description: true },
   })
 
@@ -30,7 +32,7 @@ export async function GET(req: Request) {
     const summary = await generateSummary(article.title, article.description)
     await prisma.article.update({
       where: { url },
-      data: { isPickedAt: today, aiSummary: summary },
+      data: { isPickedAt: since, aiSummary: summary },
     })
   }
 
