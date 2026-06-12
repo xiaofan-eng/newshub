@@ -9,7 +9,6 @@ export const RSS_SOURCES = [
   { name: 'The Guardian',   url: 'https://www.theguardian.com/world/rss',                              category: '世界', isChinese: false },
   // 财经
   { name: 'Financial Times',url: 'https://www.ft.com/rss/home',                                        category: '财经', isChinese: false },
-  { name: '财新网',          url: 'https://www.caixin.com/rss/home.xml',                                category: '财经', isChinese: true  },
   { name: 'Bloomberg',      url: 'https://feeds.bloomberg.com/markets/news.rss',                        category: '财经', isChinese: false },
   { name: 'WSJ',            url: 'https://feeds.a.dj.com/rss/RSSMarketsMain.xml',                      category: '财经', isChinese: false },
   // AI
@@ -24,8 +23,6 @@ export const RSS_SOURCES = [
   { name: 'The Register',   url: 'https://www.theregister.com/headlines.atom',                         category: '科技', isChinese: false },
   // 健康
   { name: 'WHO News',       url: 'https://www.who.int/rss-feeds/news-english.xml',                    category: '健康', isChinese: false },
-  { name: 'WebMD',          url: 'https://www.webmd.com/rss/default.aspx',                            category: '健康', isChinese: false },
-  { name: 'Harvard Health', url: 'https://www.health.harvard.edu/blog/feed',                          category: '健康', isChinese: false },
   // 时尚
   { name: 'Vogue',          url: 'https://www.vogue.com/feed/rss',                                     category: '时尚', isChinese: false },
   { name: 'GQ',             url: 'https://www.gq.com/feed/rss',                                        category: '时尚', isChinese: false },
