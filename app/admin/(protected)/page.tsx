@@ -61,12 +61,15 @@ export default function AdminPage() {
   }
 
   async function deleteCategory(id: string) {
-    if (!confirm('确认删除此分类？删除前请先删除该分类下所有来源。')) return
-    const res = await fetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
-    const data = await res.json()
-    if (!res.ok) { alert(data.error); return }
+    const cat = categories.find(c => c.id === id)
+    const msg = cat?._count.sources
+      ? `确认删除分类「${cat.name}」？该分类下 ${cat._count.sources} 个来源也会一并删除。`
+      : `确认删除分类「${cat?.name}」？`
+    if (!confirm(msg)) return
+    await fetch(`/api/admin/categories/${id}`, { method: 'DELETE' })
     setActiveCatId(null)
     loadCategories()
+    loadSources()
   }
 
   async function addCategory(name: string, order: number) {
