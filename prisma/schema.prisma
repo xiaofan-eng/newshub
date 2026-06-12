@@ -24,3 +24,22 @@ model Article {
   @@index([isPickedAt])
   @@index([translated])
 }
+
+model Category {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  order   Int      @default(0)
+  enabled Boolean  @default(true)
+  sources Source[]
+}
+
+model Source {
+  id         String   @id @default(cuid())
+  name       String
+  url        String   @unique
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  isChinese  Boolean  @default(false)
+  enabled    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}

@@ -1,17 +1,9 @@
 'use client'
 
-const CATEGORIES = ['全部', '世界', 'AI', '科技', '财经', '健康', '时尚', '美妆', '社会']
+import { useEffect, useState } from 'react'
 
-const SOURCES_BY_CATEGORY: Record<string, string[]> = {
-  '世界': ['BBC World', 'Al Jazeera', 'The Guardian'],
-  'AI':   ['OpenAI Blog', 'Hugging Face', 'MIT Tech Review', 'VentureBeat AI'],
-  '科技': ['TechCrunch', 'Hacker News', 'Ars Technica', 'The Register'],
-  '财经': ['Financial Times', 'Bloomberg', 'WSJ'],
-  '健康': ['WHO News'],
-  '时尚': ['Vogue', 'GQ', "Harper's Bazaar"],
-  '美妆': ['Allure', 'Refinery29'],
-  '社会': ['NYT'],
-}
+interface Category { id: string; name: string }
+interface Source { id: string; name: string; categoryId: string }
 
 export default function CategoryTabs({
   active,
@@ -24,13 +16,24 @@ export default function CategoryTabs({
   onChange: (cat: string) => void
   onSourceChange: (source: string) => void
 }) {
-  const sources = active !== '全部' ? SOURCES_BY_CATEGORY[active] ?? [] : []
+  const [categories, setCategories] = useState<Category[]>([])
+  const [sources, setSources] = useState<Source[]>([])
+
+  useEffect(() => {
+    fetch('/api/categories').then(r => r.json()).then(setCategories)
+    fetch('/api/admin/sources').then(r => r.json()).then((data: Source[] | { error: string }) => {
+      if (Array.isArray(data)) setSources(data)
+    })
+  }, [])
+
+  const allTabs = ['全部', ...categories.map(c => c.name)]
+  const activeCat = categories.find(c => c.name === active)
+  const filteredSources = activeCat ? sources.filter(s => s.categoryId === activeCat.id) : []
 
   return (
     <div style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface)' }}>
-      {/* 一级 Tab */}
-      <div className="flex overflow-x-auto" style={{ borderBottom: sources.length > 0 ? '1px solid var(--border-light)' : 'none' }}>
-        {CATEGORIES.map(cat => (
+      <div className="flex overflow-x-auto" style={{ borderBottom: filteredSources.length > 0 ? '1px solid var(--border-light)' : 'none' }}>
+        {allTabs.map(cat => (
           <button
             key={cat}
             onClick={() => onChange(cat)}
@@ -49,8 +52,7 @@ export default function CategoryTabs({
         ))}
       </div>
 
-      {/* 二级来源 Tab */}
-      {sources.length > 0 && (
+      {filteredSources.length > 0 && (
         <div className="flex flex-wrap gap-1.5 px-3 py-2">
           <button
             onClick={() => onSourceChange('')}
@@ -64,19 +66,19 @@ export default function CategoryTabs({
           >
             全部
           </button>
-          {sources.map(src => (
+          {filteredSources.map(src => (
             <button
-              key={src}
-              onClick={() => onSourceChange(src)}
+              key={src.id}
+              onClick={() => onSourceChange(src.name)}
               className="px-2.5 py-0.5 text-xs rounded-full transition-all cursor-pointer"
               style={{
                 fontFamily: 'var(--font-body)',
-                background: activeSource === src ? 'var(--accent)' : 'transparent',
-                color: activeSource === src ? '#fff' : 'var(--text-dim)',
-                border: '1px solid ' + (activeSource === src ? 'var(--accent)' : 'var(--border)'),
+                background: activeSource === src.name ? 'var(--accent)' : 'transparent',
+                color: activeSource === src.name ? '#fff' : 'var(--text-dim)',
+                border: '1px solid ' + (activeSource === src.name ? 'var(--accent)' : 'var(--border)'),
               }}
             >
-              {src}
+              {src.name}
             </button>
           ))}
         </div>

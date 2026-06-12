@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { RSS_SOURCES, fetchSource } from '@/lib/rss'
+import { getRssSources, fetchSource } from '@/lib/rss'
 
 function authorized(req: Request) {
   const auth = req.headers.get('authorization')
@@ -13,9 +13,10 @@ export async function GET(req: Request) {
   const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
   await prisma.article.deleteMany({ where: { fetchedAt: { lt: cutoff } } })
 
+  const sources = await getRssSources()
   let inserted = 0
 
-  for (const source of RSS_SOURCES) {
+  for (const source of sources) {
     const items = await fetchSource(source)
     for (const item of items) {
       if (!item.url) continue
@@ -29,22 +30,18 @@ export async function GET(req: Request) {
           source: item.source,
           category: item.category,
           publishedAt: item.publishedAt,
-          translated: item.isChinese, // 中文来源标记为已翻译
+          translated: item.isChinese,
         },
       })
       inserted++
     }
   }
 
-  return NextResponse.json({ ok: true, inserted })
-
-  // 触发翻译（fire-and-forget，不等待结果）
+  // 触发翻译（fire-and-forget）
   const host = req.headers.get('host') ?? ''
   const protocol = host.includes('localhost') ? 'http' : 'https'
-  const baseUrl = `${protocol}://${host}`
-
-  // 链式触发翻译，每次处理20篇，最多触发10轮
-  ;(async () => {
+  const baseUrl = `${protocol}://${host}` ;
+  (async () => {
     for (let i = 0; i < 10; i++) {
       try {
         const res = await fetch(`${baseUrl}/api/cron/translate`, {
@@ -55,4 +52,6 @@ export async function GET(req: Request) {
       } catch { break }
     }
   })()
+
+  return NextResponse.json({ ok: true, inserted })
 }
