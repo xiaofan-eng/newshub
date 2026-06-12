@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   if (!authorized(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   // 取过去7天内发布的文章中选
-  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
   const articles = await prisma.article.findMany({
     where: {
