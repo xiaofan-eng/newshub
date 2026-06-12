@@ -10,7 +10,7 @@ const SOURCES_BY_CATEGORY: Record<string, string[]> = {
   '健康': ['WHO News'],
   '时尚': ['Vogue', 'GQ', "Harper's Bazaar"],
   '美妆': ['Allure', 'Refinery29'],
-  '社会': ['NYT', '澎湃新闻'],
+  '社会': ['NYT'],
 }
 
 export default function CategoryTabs({
