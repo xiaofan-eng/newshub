@@ -37,4 +37,22 @@ export async function GET(req: Request) {
   }
 
   return NextResponse.json({ ok: true, inserted })
+
+  // 触发翻译（fire-and-forget，不等待结果）
+  const host = req.headers.get('host') ?? ''
+  const protocol = host.includes('localhost') ? 'http' : 'https'
+  const baseUrl = `${protocol}://${host}`
+
+  // 链式触发翻译，每次处理20篇，最多触发10轮
+  ;(async () => {
+    for (let i = 0; i < 10; i++) {
+      try {
+        const res = await fetch(`${baseUrl}/api/cron/translate`, {
+          headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+        })
+        const data = await res.json()
+        if (data.remaining === 0) break
+      } catch { break }
+    }
+  })()
 }
