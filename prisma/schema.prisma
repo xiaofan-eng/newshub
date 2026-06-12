@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Article {
+  id          String    @id @default(cuid())
+  url         String    @unique
+  title       String
+  description String
+  source      String
+  category    String
+  publishedAt DateTime
+  fetchedAt   DateTime  @default(now())
+  isPickedAt  DateTime?
+  aiSummary   String?
+
+  @@index([category])
+  @@index([fetchedAt])
+  @@index([isPickedAt])
+}

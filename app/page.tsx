@@ -1,65 +1,112 @@
-import Image from "next/image";
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import Header from '@/components/Header'
+import DailyPicks from '@/components/DailyPicks'
+import CategoryTabs from '@/components/CategoryTabs'
+import ArticleList, { Article } from '@/components/ArticleList'
+import { useBookmarks } from '@/lib/bookmarks'
+
+interface ApiResponse {
+  articles: Article[]
+  total: number
+  page: number
+  pageSize: number
+}
 
 export default function Home() {
+  const [picks, setPicks] = useState<Article[]>([])
+  const [articles, setArticles] = useState<Article[]>([])
+  const [category, setCategory] = useState('全部')
+  const [activeSource, setActiveSource] = useState('')
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [showBookmarks, setShowBookmarks] = useState(false)
+  const { bookmarks, toggle, isBookmarked } = useBookmarks()
+  const bookmarkedIds = new Set(bookmarks.map(a => a.id))
+
+  const loadArticles = useCallback(async (cat: string, src: string, p: number, append = false) => {
+    setLoading(true)
+    const params = new URLSearchParams({ category: cat, page: String(p) })
+    if (src) params.set('source', src)
+    const res = await fetch(`/api/articles?${params}`)
+    const data: ApiResponse = await res.json()
+    setArticles(prev => append ? [...prev, ...data.articles] : data.articles)
+    setTotal(data.total)
+    setLoading(false)
+  }, [])
+
+  const loadPicks = useCallback(async () => {
+    const now = new Date()
+    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
+    const res = await fetch(`/api/articles?pickedDate=${today}&pageSize=3`)
+    const data: ApiResponse = await res.json()
+    setPicks(data.articles)
+  }, [])
+
+  useEffect(() => { loadPicks() }, [loadPicks])
+  useEffect(() => {
+    if (!showBookmarks) { setPage(1); loadArticles(category, activeSource, 1) }
+  }, [category, activeSource, showBookmarks, loadArticles])
+
+  function handleCategoryChange(cat: string) {
+    setCategory(cat)
+    setActiveSource('')
+    setShowBookmarks(false)
+  }
+
+  function handleSourceChange(src: string) {
+    setActiveSource(src)
+    setPage(1)
+  }
+
+  function handleLoadMore() {
+    const next = page + 1
+    setPage(next)
+    loadArticles(category, activeSource, next, true)
+  }
+
+  const hasMore = !showBookmarks && articles.length < total
+  const displayArticles = showBookmarks ? bookmarks : articles
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen" style={{ background: 'var(--ink)' }}>
+      <Header onShowBookmarks={() => setShowBookmarks(v => !v)} showingBookmarks={showBookmarks} />
+      {!showBookmarks && <DailyPicks picks={picks} />}
+      <div className="max-w-2xl mx-auto" style={{ background: 'var(--surface)', borderRadius: '16px 16px 0 0', overflow: 'hidden' }}>
+        {showBookmarks ? (
+          <div className="px-4 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface)' }}>
+            <span style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--text-dim)', fontFamily: 'var(--font-body)' }}>
+              已收藏 {bookmarks.length} 篇
+            </span>
+          </div>
+        ) : (
+          <CategoryTabs active={category} activeSource={activeSource} onChange={handleCategoryChange} onSourceChange={handleSourceChange} />
+        )}
+        <ArticleList articles={displayArticles} bookmarkedIds={bookmarkedIds} onToggle={toggle} />
+        {hasMore && (
+          <div className="py-6 text-center" style={{ borderTop: '1px solid var(--border-light)' }}>
+            <button
+              onClick={handleLoadMore}
+              disabled={loading}
+              className="cursor-pointer disabled:opacity-30 transition-all"
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '0.7rem',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: 'var(--text-secondary)',
+                background: 'transparent',
+                border: 'none',
+                padding: '6px 16px',
+              }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+              {loading ? '加载中…' : '加载更多'}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
-  );
+  )
 }
