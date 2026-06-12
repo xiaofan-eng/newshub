@@ -14,10 +14,7 @@ export async function GET(req: Request) {
   if (category && category !== '全部') where.category = category
   if (source) where.source = source
   if (pickedDate) {
-    const start = new Date(pickedDate + 'T00:00:00.000Z')
-    start.setTime(start.getTime() - 8 * 60 * 60 * 1000) // 北京时间当天 = UTC前一天16:00
-    where.isPickedAt = { gte: start }
-    where.NOT = { isPickedAt: null }
+    where.isPickedAt = { not: null }
   }
   const [articles, total] = await Promise.all([
     prisma.article.findMany({
