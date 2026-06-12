@@ -3,13 +3,13 @@
 const CATEGORIES = ['全部', '世界', 'AI', '科技', '财经', '健康', '时尚', '美妆', '社会']
 
 const SOURCES_BY_CATEGORY: Record<string, string[]> = {
-  '世界': ['Reuters World', 'BBC World', 'AP News', 'Al Jazeera', 'The Guardian'],
-  'AI':   ['OpenAI Blog', 'Anthropic Blog', 'Hugging Face', 'The Batch', 'MIT Tech Review', 'VentureBeat AI'],
+  '世界': ['BBC World', 'Al Jazeera', 'The Guardian'],
+  'AI':   ['OpenAI Blog', 'Hugging Face', 'MIT Tech Review', 'VentureBeat AI'],
   '科技': ['TechCrunch', 'Hacker News', 'Ars Technica', 'The Register'],
   '财经': ['Financial Times', '财新网', 'Bloomberg', 'WSJ'],
-  '健康': ['WebMD', 'Health.com', '丁香园'],
+  '健康': ['Health.com', 'Healthline', 'Medical News Today'],
   '时尚': ['Vogue', 'GQ', "Harper's Bazaar"],
-  '美妆': ['Allure', 'Byrdie', 'Into The Gloss'],
+  '美妆': ['Allure', 'Refinery29'],
   '社会': ['NYT', '澎湃新闻'],
 }
 
