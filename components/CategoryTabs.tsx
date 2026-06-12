@@ -21,7 +21,7 @@ export default function CategoryTabs({
 
   useEffect(() => {
     fetch('/api/categories').then(r => r.json()).then(setCategories)
-    fetch('/api/admin/sources').then(r => r.json()).then((data: Source[] | { error: string }) => {
+    fetch('/api/sources').then(r => r.json()).then((data: Source[] | { error: string }) => {
       if (Array.isArray(data)) setSources(data)
     })
   }, [])
