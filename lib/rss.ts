@@ -29,7 +29,7 @@ export const RSS_SOURCES = [
   // 健康
   { name: 'WebMD',           url: 'https://rss.webmd.com/rss/rss.aspx?RSSSource=RSS_PUBLIC',      category: '健康', isChinese: false },
   { name: 'Health.com',      url: 'https://www.health.com/feeds/all',                              category: '健康', isChinese: false },
-  { name: '丁香园',           url: 'https://www.dxy.cn/bbs/feed/recommend.xml',                    category: '健康', isChinese: true  },
+  { name: '丁香园',           url: 'https://rsshub.app/dxy/user/6279390',                           category: '健康', isChinese: true  },
   // 时尚
   { name: 'Vogue',           url: 'https://www.vogue.com/feed/rss',                                category: '时尚', isChinese: false },
   { name: 'GQ',              url: 'https://www.gq.com/feed/rss',                                   category: '时尚', isChinese: false },

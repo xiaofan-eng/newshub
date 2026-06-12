@@ -26,9 +26,10 @@ export async function GET(req: Request) {
 
     ;[title, description] = await Promise.all([
       translateToZh(article.title),
-      translateToZh(article.description),
+      article.description.trim() ? translateToZh(article.description) : Promise.resolve(''),
     ])
 
+    // 空摘要或过短时抓全文
     if (description.trim().length < 30) {
       const summary = await summarizeFromUrl(article.url, title)
       if (summary) description = summary
