@@ -32,7 +32,7 @@ export async function GET(req: Request) {
     const summary = await generateSummary(article.title, article.description)
     await prisma.article.update({
       where: { url },
-      data: { isPickedAt: since, aiSummary: summary },
+      data: { isPickedAt: new Date(), aiSummary: summary },
     })
   }
 
