@@ -37,21 +37,20 @@ export async function GET(req: Request) {
     }
   }
 
-  // 触发翻译（fire-and-forget）
+  // 直接执行翻译（不用 fire-and-forget，Vercel 函数返回后异步任务会被终止）
   const host = req.headers.get('host') ?? ''
   const protocol = host.includes('localhost') ? 'http' : 'https'
-  const baseUrl = `${protocol}://${host}` ;
-  (async () => {
-    for (let i = 0; i < 10; i++) {
-      try {
-        const res = await fetch(`${baseUrl}/api/cron/translate`, {
-          headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
-        })
-        const data = await res.json()
-        if (data.remaining === 0) break
-      } catch { break }
-    }
-  })()
+  const baseUrl = `${protocol}://${host}`
+
+  for (let i = 0; i < 10; i++) {
+    try {
+      const res = await fetch(`${baseUrl}/api/cron/translate`, {
+        headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+      })
+      const data = await res.json()
+      if (data.remaining === 0) break
+    } catch { break }
+  }
 
   return NextResponse.json({ ok: true, inserted })
 }
